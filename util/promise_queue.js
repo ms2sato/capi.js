@@ -75,6 +75,10 @@ PromiseQueue.prototype = {
             this.actives.push(process);
             process();
         }
+    } ,
+
+    clear: function(){
+        this.queue.splice(0, this.queue.length);
     }
 }
 
