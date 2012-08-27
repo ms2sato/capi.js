@@ -95,6 +95,17 @@ exports.getSeconds = function (time) {
 
 exports.between = function (column, options) {
     var addCondition = '';
+
+    var opt = {
+        begin: options.begin,
+        end: options.end
+    }
+    if(options.$begin || options.$end){
+        opt.begin = options.$begin;
+        opt.end = options.$end;
+    }
+
+
     if (options.begin) {
         var b = exports.getSeconds(options.begin);
         addCondition += ' AND ' + b + ' <= ' + column;
@@ -215,6 +226,14 @@ Query.prototype = {
     },
 
     between:function (column, options) {
+
+        var con = {};
+        if(options.$begin || options.$end){
+            con.begin = options.$begin;
+            con.end = options.$end;
+        }else{
+            con = options;
+        }
 
         if (options.begin) {
             this.andExpression(exports.getSeconds(options.begin) + ' <= ' + column);
