@@ -16,11 +16,11 @@ exports.execQuery = function (token, query, options) {
     return exports.doExec(token, query);
 }
 
-exports.doExec = function (token, query) {
+exports.api = function(token, path){
+
+    path = path + ((path.indexOf('?') == -1)? '?':'&') + 'access_token=' + token;
+
     var promise = new Promise();
-
-    var path = '/fql?q=' + encodeURIComponent(query) + '&access_token=' + token;
-
     https.get({
         host:GRAPH_HOST,
         path:path,
@@ -57,6 +57,11 @@ exports.doExec = function (token, query) {
         });
 
     return promise;
+}
+
+exports.doExec = function (token, query) {
+    var path = '/fql?q=' + encodeURIComponent(query);
+    return exports.api(token, path);
 }
 
 exports.like = function (column, word, casesensitive) {
@@ -238,8 +243,11 @@ Query.prototype = {
         if (options.begin) {
             this.andExpression(exports.getSeconds(options.begin) + ' <= ' + column);
         }
+
+        var op = (options.includeEq)? ' <= ' : ' < ';
+
         if (options.end) {
-            this.andExpression(column + ' < ' + exports.getSeconds(options.end));
+            this.andExpression(column + op + exports.getSeconds(options.end));
         }
 
         return this;
